@@ -30,7 +30,7 @@
             background: #0a0c14;
             color: #fff;
             overflow-x: hidden;
-            padding-top: 60px;
+            padding-top: 60px; /* مسافة للشريط العلوي */
         }
 
         /* ========== شريط العنوان العلوي ========== */
@@ -104,7 +104,7 @@
             box-shadow: 0 0 30px #4f46e5;
         }
 
-        /* ========== تأثيرات حركية ========== */
+        /* ========== تأثيرات حركية متقدمة ========== */
         @keyframes glowPulse {
             0% { box-shadow: 0 0 5px #4f46e5, 0 0 10px #4f46e5; }
             50% { box-shadow: 0 0 20px #4f46e5, 0 0 30px #2563eb; }
@@ -948,16 +948,12 @@
     </style>
 </head>
 <body>
-    <!-- شريط العنوان العلوي -->
+    <!-- شريط العنوان العلوي (زي الصورة بالضبط) -->
     <div class="title-bar">
         <div class="title-bar-left">
             <img src="icon.ico" alt="West Games" class="title-bar-icon">
             <span class="title-bar-text">West Games</span>
             <span class="title-bar-badge">منصة الألعاب العربية</span>
-            <!-- زر ربط الديسكورد -->
-            <button onclick="showDiscordPopup()" style="background: #5865F2; color: white; border: none; padding: 8px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: bold; cursor: pointer; margin-right: 10px; display: flex; align-items: center; gap: 8px;">
-                <i class="fab fa-discord"></i> ربط
-            </button>
         </div>
         <button class="title-bar-btn" id="installBtn">
             <i class="fab fa-windows"></i>
@@ -971,22 +967,6 @@
             <img src="icon.ico" alt="West Games" class="welcome-logo">
             <div class="welcome-text">WEST GAMES</div>
             <div class="welcome-sub">منصة الألعاب العربية</div>
-        </div>
-    </div>
-
-    <!-- نافذة ربط الديسكورد -->
-    <div id="discordPopup" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 10001; justify-content: center; align-items: center;">
-        <div style="background: #0f172a; padding: 40px; border-radius: 30px; border: 3px solid #4f46e5; max-width: 400px; text-align: center;">
-            <i class="fab fa-discord" style="font-size: 80px; color: #5865F2; margin-bottom: 20px;"></i>
-            <h2 style="color: white; margin-bottom: 10px;">ربط حساب الديسكورد</h2>
-            <p style="color: #cbd5e1; margin-bottom: 20px;">اربط حسابك واحصل على <span style="color: #fcd34d; font-size: 1.5rem;">1000 كوينز</span> هدية!</p>
-            <div style="background: #1e293b; padding: 15px; border-radius: 15px; margin-bottom: 20px;">
-                <p style="color: #818cf8; margin-bottom: 5px;">🔑 كود الربط الخاص بك:</p>
-                <p id="userCode" style="font-size: 2rem; font-weight: bold; color: #4ade80; letter-spacing: 5px;">WEST-1234</p>
-            </div>
-            <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 20px;">انسخ هذا الكود وأرسله لبوت West Mod في الديسكورد</p>
-            <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 10px;">الأمر: <code style="background: #2563eb; padding: 5px 10px; border-radius: 10px;">!ربط WEST-1234</code></p>
-            <button onclick="closePopup()" style="background: #2563eb; color: white; border: none; padding: 12px 30px; border-radius: 50px; font-weight: bold; cursor: pointer;">تم الإرسال</button>
         </div>
     </div>
 
@@ -1128,7 +1108,6 @@
 
     <!-- Swiper JS -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    
     <script>
         // إخفاء شاشة الترحيب بعد انتهاء الأنيميشن
         setTimeout(() => {
@@ -1322,33 +1301,8 @@ const games = [
             }, 3000);
         }
 
-        // ========== دالة التحميل المعدلة مع خصم الكوينز ==========
+        // دالة التحميل
         function downloadGame(file, gameName) {
-            // التحقق من الربط
-            if(localStorage.getItem('discordLinked') !== 'true') {
-                alert('❌ يجب ربط حساب الديسكورد أولاً!');
-                showDiscordPopup();
-                return false;
-            }
-            
-            // التحقق من الكوينز
-            let coins = parseInt(localStorage.getItem('coins')) || 0;
-            if(coins < 350) {
-                alert(`❌ رصيدك غير كافي!\nالمطلوب: 350 كوينز\nرصيدك: ${coins} كوينز`);
-                return false;
-            }
-            
-            // خصم الكوينز
-            coins -= 350;
-            localStorage.setItem('coins', coins.toString());
-            
-            // إرسال إشعار للويب هوك
-            sendToDiscord({
-                content: `📥 **${gameName}** تم تحميلها!\n👤 المستخدم رصيده المتبقي: ${coins} كوينز`,
-                username: 'West Games'
-            });
-            
-            // تحميل الملف
             try {
                 const link = document.createElement('a');
                 link.href = file;
@@ -1356,9 +1310,7 @@ const games = [
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-                
-                // رسالة تأكيد
-                alert(`✅ تم التحميل بنجاح!\n💰 تم خصم 350 كوينز\n💎 رصيدك المتبقي: ${coins} كوينز`);
+                showDownloadMessage(`جاري تحميل ${gameName}...`);
             } catch (error) {
                 console.error('خطأ في التحميل:', error);
                 alert('عذراً، حدث خطأ في تحميل الملف');
@@ -1516,7 +1468,10 @@ const games = [
 
         // ========== زر تحميل الاختصار من شريط العنوان ==========
         document.getElementById('installBtn').addEventListener('click', function() {
+            // رابط الموقع الحالي
             const siteUrl = window.location.href;
+            
+            // محتوى ملف الاختصار مع الأيقونة
             const shortcutContent = `[InternetShortcut]
 URL=${siteUrl}
 IconFile=icon.ico
@@ -1526,9 +1481,11 @@ IDList=
 [{000214A0-0000-0000-C000-000000000046}]
 Prop3=19,2`;
             
+            // تحويل لملف
             const blob = new Blob([shortcutContent], { type: 'application/internet-shortcut' });
             const url = window.URL.createObjectURL(blob);
             
+            // تحميل الملف
             const link = document.createElement('a');
             link.href = url;
             link.download = 'West Games.url';
@@ -1537,8 +1494,11 @@ Prop3=19,2`;
             document.body.removeChild(link);
             
             window.URL.revokeObjectURL(url);
+            
+            // رسالة تأكيد
             showDownloadMessage('✅ تم تجهيز اختصار الموقع');
             
+            // تعليمات للمستخدم
             setTimeout(() => {
                 alert(
                     '✅ تم تحميل اختصار West Games!\n\n' +
@@ -1585,71 +1545,6 @@ Prop3=19,2`;
         renderAds();
         renderGames();
         showPage('home');
-
-        // ========== نظام ربط الديسكورد ==========
-
-        // إظهار نافذة الربط
-        window.showDiscordPopup = function() {
-            // توليد كود عشوائي للمستخدم
-            const randomCode = 'WEST-' + Math.floor(1000 + Math.random() * 9000);
-            document.getElementById('userCode').textContent = randomCode;
-            
-            // حفظ الكود في localStorage
-            localStorage.setItem('discordLinkCode', randomCode);
-            localStorage.setItem('discordLinked', 'false');
-            localStorage.setItem('discordLinkTime', Date.now());
-            
-            // إظهار النافذة
-            document.getElementById('discordPopup').style.display = 'flex';
-        }
-
-        // إغلاق النافذة
-        window.closePopup = function() {
-            document.getElementById('discordPopup').style.display = 'none';
-            // التحقق من الربط بعد 10 ثواني
-            setTimeout(checkDiscordLink, 10000);
-        }
-
-        // التحقق من الربط
-        function checkDiscordLink() {
-            if(localStorage.getItem('discordLinked') === 'true') {
-                let coins = parseInt(localStorage.getItem('coins')) || 0;
-                coins += 1000;
-                localStorage.setItem('coins', coins.toString());
-                
-                alert(`✅ تم الربط بنجاح!\n💰 استلمت 1000 كوينز هدية\n💎 رصيدك الحالي: ${coins} كوينز`);
-                
-                // إرسال إشعار للويب هوك
-                sendToDiscord({
-                    content: `✅ مستخدم جديد ربط حسابه واستلم 1000 كوينز!`,
-                    username: 'West Games'
-                });
-            }
-        }
-
-        // دالة إرسال إشعار للويب هوك
-        async function sendToDiscord(data) {
-            const webhookUrl = 'https://discord.com/api/webhooks/1475087874058879166/gu5hTf0EJbh06Y9_xd4-3fsWhwLYrJ7_VPOZkJiJtyG2ENz4OFDgFKN3J0xAyS-tV5JQ';
-            
-            try {
-                const response = await fetch(webhookUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                
-                if(response.ok) {
-                    console.log('✅ تم إرسال الإشعار');
-                }
-            } catch (error) {
-                console.error('❌ خطأ في إرسال الإشعار:', error);
-            }
-        }
-
-        // التحقق من الربط عند تحميل الصفحة
-        if(localStorage.getItem('discordLinked') === 'true') {
-            console.log('✅ الحساب مربوط مسبقاً');
-        }
     </script>
 </body>
 </html>
